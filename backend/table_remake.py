@@ -1,9 +1,16 @@
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
 from urllib.parse import quote
+
+from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from pyvirtualdisplay import Display
+from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
+from webdriver_manager.firefox import GeckoDriverManager
 
 
 def get_code_from_string(text, pattern = r"ОКПД2: \s*(.+)"):
@@ -78,12 +85,15 @@ def get_data_with_selenium(name, driver):
 
 # get_data_with_selenium('ТУМБА МЕДИЦИНСКАЯ МД ТП-3')
 
-import pandas as pd
 import re
 import time
+
+import pandas as pd
 from openai import OpenAI
+
 from chatgpt_session import ChatGPTSession, pretty_print
 from info import API_KEY, ASSIST_ID
+
 
 def transfer_data_kp_to_spec(kp_path, spec_path, output_path):
     client = OpenAI(api_key=API_KEY)
@@ -108,7 +118,15 @@ def transfer_data_kp_to_spec(kp_path, spec_path, output_path):
     specification_data['regnum'] = ''
     specification_data['regdate'] = ''
     specification_data['okpd2'] = ''
-    driver = webdriver.Chrome()
+    options = Options()
+    options.add_argument('--headless')
+    options.add_argument('--disable-gpu')
+    options.add_argument('--no-sandbox')
+    options.add_argument('--disable-dev-shm-usage')
+
+    # service = Service(GeckoDriverManager().install(), log_path='geckodriver.log')
+    service = Service(GeckoDriverManager().install())
+    driver = webdriver.Firefox(options=options, service=service)
     # specification_data.reset_index(inplace=True)
     for index, row in kp_data.iterrows():
         if row['Наименование от ГМК Киль'] is not None and row['Ставка НДС'] != 0.2 and row['Наименование от ГМК Киль'] != 'Наименование от ГМК Киль':
