@@ -1,3 +1,8 @@
 flask
 selenium
 openai
+flask_cors
+apscheduler
+pyvirtualdisplay
+webdriver_manager
+pandas

@@ -86,9 +86,9 @@ def upload_file():
     #     return jsonify({"filename": file.filename, "file": encoded_file}), 200
 
 
-# @app.route("/api/v1/users")
-# def list_users():
-#     return "example bro, u got it"
+@app.route("/api/v1/users")
+def list_users():
+    return "example bro, u got it"
 
 # @app.route("/")
 # def base():
