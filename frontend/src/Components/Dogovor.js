@@ -1,12 +1,12 @@
 import axios from 'axios';
 import React, { useState } from 'react';
 
-function Main() {
+function Dogovor() {
   const [value, setValue]=useState("");
 
   return (
     <div className='kp'>
-      <h1 className='name'>Заполнение КП</h1>
+      <h1 className='name'>Заполнение договора</h1>
     <div className="main">
       <div className='about'>
         <h1>Добро пожаловать на сайт для быстрого форматирования файлов</h1>
@@ -25,7 +25,7 @@ function Main() {
               onClick={()=>{
                 const formData= new FormData()
                 formData.append('file',value)
-                const user1 = axios.post("http://localhost:8000",formData,{ responseType: 'blob' })
+                const user1 = axios.post("http://localhost:8000/kp",formData,{ responseType: 'blob' })
                 .then(res=>{
                   console.log(res.data)
                   
@@ -34,7 +34,7 @@ function Main() {
 
                   let anchor =document.createElement('a');
                   anchor.href=url;
-                  anchor.download='img.xlsx';
+                  anchor.download='dog.xlsx';
                   document.body.append(anchor);
                   anchor.style="display : none";
                   anchor.click();
@@ -46,8 +46,16 @@ function Main() {
                 .catch(error=>{
                   console.error(error)
                 });
+
+                // const user= axios.get("http://localhost:8000").then(response =>{
+                //   console.log(response.data);
+                // }).catch(error=>{
+                //   console.error(error)
+                // });
+                // console.log(user.headers);
               }}>Отправить</button>
         </form>
+        {/* <button className='send'>Отправить</button> */}
     </div>
     <div className="example">
       <h1 className='name'>Пример формата исходной таблицы КП</h1>
@@ -102,4 +110,4 @@ function Main() {
   );
 }
 
-export default Main;
+export default Dogovor;
