@@ -92,12 +92,12 @@ import pandas as pd
 from openai import OpenAI
 
 from chatgpt_session import ChatGPTSession, pretty_print
-from info import API_KEY, ASSIST_ID
+from info import API_KEY, ASSIST_OKPD2
 
 
 def transfer_data_kp_to_spec(kp_path, spec_path, output_path):
     client = OpenAI(api_key=API_KEY)
-    session = ChatGPTSession(assistant_id=ASSIST_ID, client=client)
+    session = ChatGPTSession(assistant_id=ASSIST_OKPD2, client=client)
 
     kp_data = pd.read_excel(kp_path)
     specification_data = pd.DataFrame()

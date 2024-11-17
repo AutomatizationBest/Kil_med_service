@@ -4,6 +4,9 @@ import logging
 from io import BytesIO
 from flask_cors import CORS, cross_origin
 from table_remake import transfer_data_kp_to_spec
+import asyncio
+
+
 app = Flask(__name__)
 cors = CORS(app, resources={r"*": {"origins": "*"}}, methods=['POST', 'GET'])
 UPLOAD_FOLDER = './uploads'
@@ -34,7 +37,7 @@ def list_users():
 
         file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
         file.save(file_path)
-        answer=''
+        answer=make_oleg_file(file_path)
     return send_file(answer, mimetype='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',as_attachment=True)
 
 
@@ -44,6 +47,7 @@ def load_kp_file():
     return {"answer" : "File load succesfully broooo!!!"}
 
 if __name__ == "__main__":
+    from parallel_oleg import make_oleg_file
     try:
         app.run(port=8000)
     except Exception as e:

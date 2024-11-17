@@ -1,5 +1,5 @@
 import re
-from info import API_KEY, ASSIST_ID
+# from info import API_KEY, ASSIST_ID
 from openai import OpenAI
 from selenium import webdriver
 from selenium.webdriver.common.by import By
