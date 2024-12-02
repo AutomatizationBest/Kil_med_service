@@ -16,6 +16,7 @@ function Main() {
             <input 
               name='file' 
               type='file' 
+              accept='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
               className='addfile'
               onChange={(e)=>{setValue(e.target.files[0])
               }}/>
