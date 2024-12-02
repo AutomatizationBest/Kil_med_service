@@ -74,22 +74,23 @@ def get_info_from_table(html : str, models : bool = False) -> dict:
             rows_data[i]['full_model'] = cells[1].text.strip()
 
     else:
-        
-        for row in soup.find_all('tr')[1:]:
-            row_data : dict = {}
-            id_to_click = row.get('id')
-            cells = row.find_all('td')
-            unique_id = cells[0].text.strip()
-            
-            rows_data[unique_id] = {}
-            rows_data[unique_id]['id_to_click'] = id_to_click
-            rows_data[unique_id]['registration_number'] = cells[1].text.strip()
-            rows_data[unique_id]['registration_date'] = cells[2].text.strip()
-            rows_data[unique_id]['expiry_date'] = cells[3].text.strip()
-            rows_data[unique_id]['product_description'] = cells[4].get('title')
-            rows_data[unique_id]['firm'] = cells[8].text.strip()
-            rows_data[unique_id]['data_link'] = cells[0].get('data-src')
-        
+        try:
+            for row in soup.find_all('tr')[1:]:
+                row_data : dict = {}
+                id_to_click = row.get('id')
+                cells = row.find_all('td')
+                unique_id = cells[0].text.strip()
+                
+                rows_data[unique_id] = {}
+                rows_data[unique_id]['id_to_click'] = id_to_click
+                rows_data[unique_id]['registration_number'] = cells[1].text.strip()
+                rows_data[unique_id]['registration_date'] = cells[2].text.strip()
+                rows_data[unique_id]['expiry_date'] = cells[3].text.strip()
+                rows_data[unique_id]['product_description'] = cells[4].get('title')
+                rows_data[unique_id]['firm'] = cells[8].text.strip()
+                rows_data[unique_id]['data_link'] = cells[0].get('data-src')
+        except IndexError:
+            return None
         
     return rows_data
 

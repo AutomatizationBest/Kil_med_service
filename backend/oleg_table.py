@@ -24,14 +24,26 @@ ros_zdrav_nadzor_url = 'https://roszdravnadzor.gov.ru/services/misearch'
 
 
 logger = logging.getLogger(name='GPT_Service')
+logging.basicConfig(level=logging.INFO, filename='test_output.log')
+httpx_logger = logging.getLogger("httpx")
+httpx_logger.setLevel(logging.WARNING) 
 # ASSIST_FIND_EQUAL_ID = 'asst_qGPbX4gRfgZfi4jxMz3LiUHP'
 
-def pretty_print(messages):
-    print("# Messages")
-    for m in messages:
-        print(f"{m.role}: {m.content[0].text.value}")
-        answer = m.content[0].text.value
+def cut_string(string: str):
+    array = string.split()
+    array = array[:-1]
+    return ' '.join(array)
 
+def pretty_print(messages):
+    
+    logger.info("# Messages")
+    user_assist_mess = {}
+    for m in messages:
+        # print(f"{m.role}: {m.content[0].text.value}")
+        user_assist_mess[m.role] = m.content[0].text.value
+        answer = m.content[0].text.value
+    for role, item in user_assist_mess.items():
+        logger.info(f"{role}: {item}")
     return answer
 
 
@@ -43,7 +55,7 @@ class ChatGPTSession:
         self.thread = client.beta.threads.create()
         self.thread_id = self.thread.id
             
-        print(self.thread_id)
+        logger.info(f'Initializing: {self.thread_id}')
 
     def create_msg(self, user_msg):
         message_create = self.client.beta.threads.messages.create(
@@ -51,7 +63,6 @@ class ChatGPTSession:
             thread_id=self.thread_id,
             content=f"{user_msg}"
         )
-        # print(f"Что создалось: {message_create}")
 
     def thread_running(self):
         run = self.client.beta.threads.runs.create(
@@ -144,7 +155,7 @@ def choose_target(data : dict,  base_input : str, session_equal : ChatGPTSession
         if counter == 1:
             return key
         
-        print("MESSAGE\n", message)
+        logger.info(f"MESSAGE equal {session_equal.thread.id}\n")
         session_equal.ask_assistant(user_msg=message)
         
         answer = pretty_print(session_equal.get_response(session_equal.thread.id))
@@ -159,22 +170,38 @@ def get_data_for_oleg(session_equal : ChatGPTSession, driver : webdriver, find_i
     
     
     # ПОИСК
-    input_label = driver.find_element(by=By.ID, value='id_q_mi_label_application')
-    input_label.click()
-    input_label.send_keys(find_id)
-    driver.find_element(by=By.CLASS_NAME, value='search-form-simple-submit').click()
-    time.sleep(7)
-    table_selenium = WebDriverWait(driver, 10).until(
-        EC.presence_of_all_elements_located((By.ID, 'DataTables_Table_1'))
-    )
+    def input_and_find(find_id : str = find_id):
+        
+        input_label = driver.find_element(by=By.ID, value='id_q_mi_label_application')
+        input_label.click()
+        input_label.clear()
+        input_label.send_keys(find_id)
+        driver.find_element(by=By.CLASS_NAME, value='search-form-simple-submit').click()
+        time.sleep(5)
+        table_selenium = WebDriverWait(driver, 10).until(
+            EC.presence_of_all_elements_located((By.ID, 'DataTables_Table_1'))
+        )
 
-    table_selenium = driver.find_element(by=By.ID, value='DataTables_Table_1')
+        table_selenium = driver.find_element(by=By.ID, value='DataTables_Table_1')
+
+        return table_selenium.get_attribute('outerHTML'), table_selenium
     
-    table_html = table_selenium.get_attribute('outerHTML')
-    
-    
-    # ТАБЛИЦА
+    table_html, table_selenium = input_and_find()
     table = get_info_from_table(table_html)
+    name_to_find = name
+
+    # ТАБЛИЦА
+    while table is None:
+
+        table_html, table_selenium = input_and_find(name_to_find)
+        table = get_info_from_table(table_html)
+        if table is not None:
+            break
+        
+        name_to_find = cut_string(name_to_find)
+        if len(name_to_find.split(' ')) <= 3:
+            logger.warning(f'Длина наименования {name} <= 3 - пропускаю поиск')
+            return None
     id_to_click = choose_target(table, name, session_equal, firm)
     # id_to_click = '23887'
     

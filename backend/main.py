@@ -49,6 +49,6 @@ def load_kp_file():
 if __name__ == "__main__":
     from parallel_oleg import make_oleg_file
     try:
-        app.run(port=8000)
+        app.run(host="0.0.0.0", port=8000)
     except Exception as e:
         logging.error(f"Error occurred: {e}")
