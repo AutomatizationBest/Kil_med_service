@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Относительный путь к Tailscale
-TAILSCALE_PATH="/install_scripts/tailscale"
+TAILSCALE_PATH="./tailscale"
 
 # Стандартный путь для пользовательских программ
 INSTALL_PATH="/usr/local/bin/tailscale"

@@ -289,6 +289,3 @@ def define_right_model(data : dict, initial_code : str) -> int:
 
 # code = define_device_code(code_session, 'Прибор для упаковки медицинских изделий методом термосварки hm 800 DC')
 # print(get_data_for_oleg(driver, code, 'Прибор для упаковки медицинских изделий методом термосварки hm 800 DC'))
-
-
-
