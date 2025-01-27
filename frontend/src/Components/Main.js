@@ -1,11 +1,13 @@
 import axios from 'axios';
 import React, { useState } from 'react';
+import img from '../media/file-upload.png';
 
 function Main() {
   const [value, setValue]=useState("");
 
   return (
     <div className='kp'>
+      <a name='kp'/>
       <h1 className='name'>Заполнение КП</h1>
     <div className="main">
       <div className='about'>
@@ -13,6 +15,10 @@ function Main() {
         <h1>Lorem ipsum dolor sit amet consectetur adipisicing elit. Libero doloremque doloribus optio voluptate sapiente est culpa praesentium alias eius, perferendis laboriosam unde accusamus, dignissimos corrupti quibusdam, odio ipsa! Enim, pariatur.</h1>
       </div>
         <form action='#' className='excel'>
+           <div className='dnd'>
+            <div className="droparea">
+              <img src={img}/>
+            </div>
             <input 
               name='file' 
               type='file' 
@@ -20,6 +26,7 @@ function Main() {
               className='addfile'
               onChange={(e)=>{setValue(e.target.files[0])
               }}/>
+              </div>
             <button 
               type='submit' 
               className='send'
@@ -51,7 +58,7 @@ function Main() {
         </form>
     </div>
     <div className="example">
-      <h1 className='name'>Пример формата исходной таблицы КП</h1>
+      <h1 className='name'>Необходимые заполненные столбцы</h1>
       <table border='1' cellSpacing='0' cellPadding="10">
         <tr>
           <th>№пп</th>
