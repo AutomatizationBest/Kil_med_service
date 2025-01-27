@@ -6,3 +6,6 @@ apscheduler
 pyvirtualdisplay
 webdriver_manager
 pandas
+uvicorn
+fastapi
+python-multipart
