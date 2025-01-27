@@ -10,7 +10,7 @@ from webdriver_manager.chrome import ChromeDriverManager
 from webdriver_manager.firefox import GeckoDriverManager
 
 from oleg_table import (ChatGPTSession, define_device_code,
-                        get_data_for_oleg, logger)
+                        get_data_for_oleg, logger, highlight_comments)
 from rzerrors import RZErrors
 import asyncio
 
@@ -21,8 +21,7 @@ client = OpenAI(api_key=API_KEY)
 country_synonyms = {
     "кнр": "китай",
     "china": "китай",
-    "россия": "россия",  # Пример для других стран
-    # Добавьте другие синонимы по необходимости
+    "россия": "россия",
 }
 
 def normalize_country(country_name):
@@ -143,8 +142,11 @@ def make_oleg_file(kp_path : str):
 
     output_data = parallel_transfer_data_roszdrav(kp_path, output_path, num_threads=10)
     output_data.to_excel(output_path, merge_cells=True, float_format="%.2f", index_label='№ п/п')
+    highlight_comments(output_path)
     logger.info(f"Data transferred and saved to {output_path}")
 
     logger.info(f"ОБЩЕЕ ВРЕМЯ: {time.time() - init_time} сек")
     # print(output_path)
     return output_path
+
+

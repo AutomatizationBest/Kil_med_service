@@ -1,22 +1,25 @@
-import pandas as pd
-from datetime import datetime
+import logging
 import re
-from openai import OpenAI
-from selenium import webdriver
-from selenium.webdriver.common.by import By
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
+import time
+from datetime import datetime
 from urllib.parse import quote
+
+import pandas as pd
+from bs4 import BeautifulSoup
+from openai import OpenAI
+from openpyxl import load_workbook
+from openpyxl.styles import PatternFill
+from openpyxl.utils import get_column_letter
+from selenium import webdriver
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.webdriver.common.by import By
 from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.firefox.service import Service
+from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.support.ui import WebDriverWait
 from webdriver_manager.firefox import GeckoDriverManager
-from bs4 import BeautifulSoup
-from html_finder import get_info_from_table, find_reg_params
 
-import time
-from openai import OpenAI
-import logging
+from html_finder import find_reg_params, get_info_from_table
 
 # client = OpenAI(api_key=API_KEY)
 
@@ -271,6 +274,33 @@ def define_right_model(data : dict, initial_code : str) -> int:
     
     return None
 
+
+def highlight_comments(file_path):
+    wb = load_workbook(file_path)
+    ws = wb.active
+    
+    header = [cell.value for cell in ws[1]]  
+    if "Комментарий" not in header:
+        logger.error("Столбец 'Комментарий' не найден.")
+        return
+    
+    comment_column_index = header.index("Комментарий") + 1  
+    flag = False
+    highlight_fill = PatternFill(start_color="FFCCCC", end_color="FFCCCC", fill_type="solid")
+
+    for row in ws.iter_rows(min_row=2, max_row=ws.max_row):
+        comment_cell = row[comment_column_index - 1]  
+        if comment_cell.value: 
+            flag = True
+            for cell in row: 
+                cell.fill = highlight_fill  
+
+    comment_column_letter = get_column_letter(comment_column_index)
+    
+    ws.column_dimensions[comment_column_letter].width = 40
+    if flag:
+        logger.warning("В таблице есть комментарии. Выделено бледно-красным.")
+    wb.save(file_path)
 
 # data = {0: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: EI1-2'}, 1: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: EI2-2'}, 2: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: GI11-2'}, 3: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: GI12-2'}, 4: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: GI2-2'}, 5: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: GI7-2'}, 6: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: LI15-2'}, 7: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: LI20-2'}, 8: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: LI27-2'}, 9: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: LI5-2'}, 10: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: RI28-2'}, 11: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: RI40-2'}, 12: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: SI4-2'}, 13: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: SI6-2'}, 14: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели: SI6R-2'}, 15: {'full_model': 'Инкубаторы лабораторные Shellab с принадлежностями и без принадлежностей, модели:\xa0GI6-2'}}
 
